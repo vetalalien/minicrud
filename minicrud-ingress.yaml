@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minicrud-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+#  defaultBackend:
+#    service:
+#      name: minicrud
+#      port:
+#        number: 8000
+  rules:
+  - host: arch.homework
+    http:
+      paths:
+      - path: /otusapp/vitalii/
+        pathType: Prefix
+        backend:
+          service:
+            name: minicrud
+            port:
+              number: 8000

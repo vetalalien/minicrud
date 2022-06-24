@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minicrud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        app: minicrud
+  template:
+    metadata:
+      labels:
+        app: minicrud
+    spec:
+      initContainers:
+      - name: check-db-ready
+        image: postgres:9.4
+        command: ['sh', '-c',
+          'until pg_isready -h postgres -p 5432;
+          do echo waiting for database; sleep 2; done;']
+      containers:
+      - name: minicrud
+        image: vetalalien/minicrud:v1
+        imagePullPolicy: "Always"
+        env:
+        - name: DB_DRIVER
+          value: "org.postgresql.Driver"
+        - name: DB_DIALECT
+          value: "org.hibernate.dialect.PostgreSQL94Dialect"
+        - name: DB_URL
+          value: "jdbc:postgresql://postgres:5432/minicrud_db?autoReconnect=true"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 3
