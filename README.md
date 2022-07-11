@@ -11,3 +11,6 @@ kubectl port-forward deployment/minicrud 8000:8000
 
 ingress настроен по требованиям второго дз - при переходе на http://arch.homework/otusapp/vitalii/ отображается главная страница.
 добавление после .../vitalii/ какого-либо имени никакого эффекта не даёт - повторюсь, так настроен ingress (../vitalii/{etc_path/.../)
+
+#kube secrets
+kubectl create secret generic postgres-secret --from-literal=POSTGRES_DB=minicrud_db --from-literal=POSTGRES_USER=minicrud --from-literal=POSTGRES_PASSWORD=minicrud
